@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, computed_field
-from typing import Literal,Annotated
-import pickle 
-import pandas as  pd
+from typing import Literal
+from typing_extensions import Annotated
+import pickle
+import pandas as pd
 from schema.user_input import UserInput
-from predict import predict_output,model
+from predict import predict_output, model, MODEL_VERSION
+import uvicorn
 
 
 app = FastAPI()
@@ -41,8 +43,11 @@ def predict_premium(data:UserInput):
     try:
         prediction =predict_output(user_input)
 
-        return JSONResponse(status_code=200, content={"Predicted_category":prediction})
-    
+        return JSONResponse(status_code=200, content={"Predicted_category": prediction})
     except Exception as e:
-        return JSONResponse(ststus_code=500, content=str(e))
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+if __name__ == '__main__':
+    uvicorn.run('app:app', host='127.0.0.1', port=8000, reload=False)
     
